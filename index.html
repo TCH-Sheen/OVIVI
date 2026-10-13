@@ -3,59 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Sorting Game: Real Photos Hand Gesture Edition</title>
+    <title>Animal Sorting Game: Hand Gesture Edition</title>
     <!-- Stable MediaPipe Script Delivery Matrix -->
     <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
     <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0; background-color: #eef2f7; overflow: hidden; text-align: center;
+            margin: 0; padding: 0; background-color: #f0f4f8; overflow: hidden; text-align: center;
+            user-select: none;
         }
-        h1 { margin: 10px 0; color: #2c3e50; font-size: 26px; }
-        #game-container { position: relative; width: 100vw; height: 82vh; display: flex; justify-content: space-between; }
+        h1 { margin: 15px 0; color: #2c3e50; font-size: 26px; }
+        #game-container { position: relative; width: 100vw; height: 80vh; display: flex; justify-content: space-between; }
         #webcam { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); z-index: 1; }
         #canvas-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
         .column {
-            position: relative; width: 31%; height: 92%; margin: 15px;
-            background-color: rgba(255, 255, 255, 0.25); border: 4px dashed #2c3e50; border-radius: 20px;
-            z-index: 3; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(6px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            position: relative; width: 32%; height: 90%; margin: 20px;
+            background-color: rgba(255, 255, 255, 0.35); border: 4px dashed #2c3e50; border-radius: 15px;
+            z-index: 3; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(4px);
         }
-        .column h2 { background-color: #2c3e50; color: white; padding: 12px 24px; border-radius: 12px; margin-top: 20px; font-size: 22px; letter-spacing: 1px; }
+        .column h2 { background-color: #2c3e50; color: white; padding: 10px 20px; border-radius: 10px; margin-top: 15px; font-size: 22px; }
         .animal-card {
-            position: absolute; width: 160px; height: 160px; background-color: white; border: 4px solid #34495e;
-            border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            font-weight: bold; font-size: 18px; z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            overflow: hidden; transition: transform 0.1s;
+            position: absolute; width: 150px; height: 150px; background-color: #ffffff; border: 4px solid #34495e;
+            border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 18px; z-index: 10; box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+            left: calc(50% - 75px); top: calc(50% - 75px);
         }
-        .animal-img { width: 100%; height: 115px; object-fit: cover; border-bottom: 3px solid #34495e; }
-        .animal-label { height: 45px; display: flex; align-items: center; justify-content: center; color: #2c3e50; background: #fff; width: 100%; }
+        .animal-icon-box {
+            width: 100%; height: 95px; display: flex; align-items: center; justify-content: center;
+            background: #f7f9fa; border-top-left-radius: 16px; border-top-right-radius: 16px;
+        }
+        .animal-svg-graphics { width: 70px; height: 70px; }
+        .animal-label { height: 45px; display: flex; align-items: center; justify-content: center; color: #2c3e50; background: #ffffff; width: 100%; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
         #status-message {
-            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(44, 62, 80, 0.95); color: white; padding: 14px 40px; border-radius: 30px;
-            font-size: 18px; z-index: 20; box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.95); color: white; padding: 12px 35px; border-radius: 25px;
+            font-size: 18px; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <h1>🦅 Animal Sorting Game: Oviparous vs Viviparous 🐅</h1>
+    <h1>🥚 Animal Sorting: Oviparous vs Viviparous 🐾</h1>
     
     <div id="game-container">
         <video id="webcam" autoplay playsinline></video>
         <canvas id="canvas-overlay"></canvas>
 
         <div class="column" id="oviparous-zone"><h2>OVIPAROUS (Eggs)</h2></div>
-        <div class="column" id="viviparous-zone"><h2>VIVIPAROUS (Live Birth)</h2></div>
+        <div class="column" id="viviparous-zone"><h2>VIVIPAROUS (Live)</h2></div>
 
         <div id="animal" class="animal-card">
-            <img class="animal-img" id="photo" src="" alt="Animal Image">
+            <div class="animal-icon-box" id="graphic-holder"></div>
             <div class="animal-label" id="label">Loading...</div>
         </div>
     </div>
 
-    <div id="status-message">Initializing hand gesture AI tracking matrix...</div>
+    <div id="status-message">Connecting to MediaPipe Hand AI engines...</div>
 
     <script>
         const videoElement = document.getElementById('webcam');
@@ -63,99 +67,38 @@
         const canvasCtx = canvasElement.getContext('2d');
         const animalCard = document.getElementById('animal');
         const statusText = document.getElementById('status-message');
+        const graphicHolder = document.getElementById('graphic-holder');
 
-        // Comprehensive Array of 17 Real Animals using Unsplash Real Photography Streams
+        // Self-contained high-quality dynamic visual inline vectors (School network block protection)
         const pool = [
-            { name: 'Chicken', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Dog', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Frog', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Cat', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Turtle', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Lion', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Duck', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Elephant', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Eagle', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Cow', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Snake', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Whale', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Crocodile', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Kangaroo', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Penguin', img: 'https://unsplash.com', type: 'oviparous' },
-            { name: 'Monkey', img: 'https://unsplash.com', type: 'viviparous' },
-            { name: 'Butterfly', img: 'https://unsplash.com', type: 'oviparous' }
+            { name: 'Chicken', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#d35400"><path d="M12,2A3,3 0 0,1 15,5V6H17A2,2 0 0,1 19,8V10C19,13.79 15.93,16.86 12.14,16.97L12,17C7.58,17 4,13.42 4,9C4,7.42 4.46,5.95 5.24,4.71L5.3,4.62L12,2M12,18A1,1 0 0,1 13,19V22H11V19A1,1 0 0,1 12,18M7.5,9A1.5,1.5 0 1,0 6,7.5A1.5,1.5 0 0,0 7.5,9Z"/></svg>' },
+            { name: 'Dog', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#e67e22"><path d="M10,21A1,1 0 0,1 9,22H7A1,1 0 0,1 6,21V18H4A2,2 0 0,1 2,16V9A5,5 0 0,1 7,4H9A1,1 0 0,1 10,5V7H14V5A1,1 0 0,1 15,4H17A5,5 0 0,1 22,9V16A2,2 0 0,1 20,18H18V21A1,1 0 0,1 17,22H15A1,1 0 0,1 14,21V18H10V21M7,7A1,1 0 1,0 6,6A1,1 0 0,0 7,7M17,7A1,1 0 1,0 16,6A1,1 0 0,0 17,7Z"/></svg>' },
+            { name: 'Frog', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#27ae60"><path d="M12,2A4,4 0 0,1 16,6C16,7.5 15.17,8.81 13.94,9.5C16.82,10.22 19,12.85 19,16V18A2,2 0 0,1 17,20H7A2,2 0 0,1 5,18V16C5,12.85 7.18,10.22 10.06,9.5C8.83,8.81 8,7.5 8,6A4,4 0 0,1 12,2M9.5,6A1,1 0 1,0 10.5,7A1,1 0 0,0 9.5,6M14.5,6A1,1 0 1,0 15.5,7A1,1 0 0,0 14.5,6Z"/></svg>' },
+            { name: 'Cat', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#7f8c8d"><path d="M12,9A5,5 0 0,1 17,14V20A2,2 0 0,1 15,22H9A2,2 0 0,1 7,20V14 tactics A5,5 0 0,1 12,9M6,2L9,6H3L6,2M18,2L21,6H15L18,2Z"/></svg>' },
+            { name: 'Turtle', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#16a085"><path d="M12,2A3,3 0 0,1 15,5V6.1C18.3,7.2 20.8,9.9 21.7,13.3L22,14.5A2,2 0 0,1 20,16.5H4A2,2 0 0,1 2,14.5L2.3,13.3C3.2,9.9 5.7,7.2 9,6.1V5A3,3 0 0,1 12,2Z"/></svg>' },
+            { name: 'Lion', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#d35400"><path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,6A4,4 0 0,1 16,10C16,12.21 14.21,14 12,14A4,4 0 0,1 8,10C8,7.79 9.79,6 12,6Z"/></svg>' },
+            { name: 'Bird / Duck', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#f1c40f"><path d="M12,2A4,4 0 0,1 16,6C16,7.5 15.17,8.81 13.94,9.5C17.5,10 20,13 20,16.5V18H4V16.5C4,13 6.5,10 10.06,9.5C8.83,8.81 8,7.5 8,6A4,4 0 0,1 12,2Z"/></svg>' },
+            { name: 'Elephant', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#95a5a6"><path d="M12,2A8,8 0 0,1 20,10V14A4,4 0 0,1 16,18H15V21H13V18H11V21H9V18H8A4,4 0 0,1 4,14V10A8,8 0 0,1 12,2M9,9A1.5,1.5 0 1,0 10.5,10.5A1.5,1.5 0 0,0 9,9M15,9A1.5,1.5 0 1,0 16.5,10.5A1.5,1.5 0 0,0 15,9Z"/></svg>' },
+            { name: 'Snake', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#27ae60"><path d="M19,2C20.66,2 22,3.34 22,5C22,6.66 20.66,8 19,8H17V10H19A3,3 0 0,1 22,13C22,14.66 20.66,16 19,16H9A1,1 0 0,0 8,17A1,1 0 0,0 9,18H19A3,3 0 0,1 22,21C22,22.66 20.66,24 19,24H5C3.34,24 2,22.66 2,21C2,19.34 3.34,18 5,18H7V16H5A3,3 0 0,1 2,13C2,11.34 3.34,10 5,10H15A1,1 0 0,0 16,9A1,1 0 0,0 15,8H5C3.34,8 2,6.66 2,5C2,3.34 3.34,2 5,2H19Z"/></svg>' },
+            { name: 'Whale / Fish', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#2980b9"><path d="M2,12C2,7.58 5.58,4 10,4C14.42,4 18,7.58 18,12C18,14.08 17.21,15.97 15.93,17.41L22,22H18L13.41,17.41C12.37,17.79 11.21,18 10,18C5.58,18 2,14.42 2,12Z"/></svg>' },
+            { name: 'Monkey', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#8d4213"><path d="M12,2A6,6 0 0,1 18,8C18,10.65 16.27,12.9 13.9,13.65L16,20H13V15H11V20H8L10.1,13.65C7.73,12.9 6,10.65 6,8A6,6 0 0,1 12,2M9,8A1,1 0 1,0 10,9A1,1 0 0,0 9,8M15,8A1,1 0 1,0 16,9A1,1 0 0,0 15,8Z"/></svg>' },
+            { name: 'Butterfly', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#9b59b6"><path d="M12,2C13,2 14,4 14,6C14,8 13,10 12,10C11,10 10,8 10,6C10,4 11,2 12,2M5,6C7.5,6 9.5,8 9.5,10.5C9.5,13 7.5,15 5,15C2.5,15 0.5,13 0.5,10.5C0.5,8 2.5,6 5,6M19,6C21.5,6 23.5,8 23.5,10.5C23.5,13 21.5,15 19,15C16.5,15 14.5,13 14.5,10.5C14.5,8 16.5,6 19,6Z"/></svg>' },
+            { name: 'Cow', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#34495e"><path d="M12,2A7,7 0 0,1 19,9V14A3,3 0 0,1 16,17H15V21H13V17H11V21H9V17H8A3,3 0 0,1 5,14V9A7,7 0 0,1 12,2Z"/></svg>' },
+            { name: 'Penguin', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#2c3e50"><path d="M12,2A5,5 0 0,1 17,7V15A5,5 0 0,1 12,20A5,5 0 0,1 7,15V7A5,5 0 0,1 12,2M10,7A1,1 0 1,0 11,8A1,1 0 0,0 10,7M14,7A1,1 0 1,0 15,8A1,1 0 0,0 14,7Z"/></svg>' },
+            { name: 'Horse / Zebra', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#7f8c8d"><path d="M19,3H16L13,8H11L8,3H5L9,10V18H11V13H13V18H15V10L19,3Z"/></svg>' },
+            { name: 'Crocodile', type: 'oviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#27ae60"><path d="M22,14H2V12H22V14M20,10H4V8H20V10M18,6H6V4H18V6Z"/></svg>' },
+            { name: 'Mouse / Kangaroo', type: 'viviparous', svg: '<svg class="animal-svg-graphics" viewBox="0 0 24 24" fill="#d35400"><path d="M12,2A4,4 0 0,1 16,6C16,8.21 14.21,10 12,10C9.79,10 8,8.21 8,6A4,4 0 0,1 12,2M4,6A2,2 0 1,1 6,8A2,2 0 0,1 4,6M20,6A2,2 0 1,1 18,8A2,2 0 0,1 20,6Z"/></svg>' }
         ];
 
-        // Shuffle the animal deck to randomize student play order
         pool.sort(() => Math.random() - 0.5);
         let currentIdx = 0;
         let isHolding = false;
 
         function resetCardPosition() {
-            animalCard.style.left = "calc(50% - 80px)";
-            animalCard.style.top = "calc(50% - 80px)";
+            animalCard.style.left = "calc(50% - 75px)";
+            animalCard.style.top = "calc(50% - 75px)";
             isHolding = false;
         }
 
-        function initDisplay() {
+        function displayCurrentItem() {
             const currentItem = pool[currentIdx];
-            document.getElementById('photo').src = currentItem.img;
-            document.getElementById('label').innerText = currentItem.name;
-            resetCardPosition();
-        }
-        initDisplay();
-
-        function spawnNext() {
-            currentIdx = (currentIdx + 1) % pool.length;
-            initDisplay();
-            statusText.innerText = "Target set: Pinch index finger & thumb together to grab the " + pool[currentIdx].name + "!";
-        }
-
-        function onResults(results) {
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight;
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const hand = results.multiHandLandmarks[0];
-                const thumb = hand[4];
-                const indexIdx = hand[8];
-
-                // Map coordinates cleanly to standard monitor pixel scaling (mirrored orientation)
-                const handX = (1 - indexIdx.x) * window.innerWidth;
-                const handY = indexIdx.y * window.innerHeight;
-
-                // Visual target point drawn over hand tip element
-                canvasCtx.beginPath();
-                canvasCtx.arc(handX, handY, 16, 0, 2 * Math.PI);
-                canvasCtx.fillStyle = isHolding ? '#2ecc71' : '#e74c3c';
-                canvasCtx.fill();
-                canvasCtx.lineWidth = 3;
-                canvasCtx.strokeStyle = '#ffffff';
-                canvasCtx.stroke();
-
-                const distance = Math.hypot(indexIdx.x - thumb.x, indexIdx.y - thumb.y);
-                const isPinching = distance < 0.055;
-
-                const rect = animalCard.getBoundingClientRect();
-                const overCard = (handX >= rect.left && handX <= rect.right && handY >= rect.top && handY <= rect.bottom);
-
-                if (isPinching && (overCard || isHolding)) {
-                    isHolding = true;
-                    animalCard.style.left = (handX - 80) + 'px';
-                    animalCard.style.top = (handY - 80) + 'px';
-                    statusText.innerText = "Dragging: " + pool[currentIdx].name;
-                } else if (!isPinching && isHolding) {
-                    const cardMidX = handX;
-                    const screenWidth = window.innerWidth;
-                    const currentItem = pool[currentIdx];
-
-                    if (cardMidX < screenWidth * 0.35) { // Drop Left Box Check
-                        if (currentItem.type === 'oviparous') {
-                            statusText.innerText = "✨ Correct! " + currentItem.name + " lays eggs! Next card incoming...";
-                            setTimeout(spawnNext, 1600);
-                        } else {
-                            statusText.innerText = "❌ Incorrect! " + currentItem.name + " gives live birth (Viviparous).";
-                            resetCardPosition();
-                        }
-                    } else if (cardMidX > screenWidth * 0.65) { // Drop Right Box Check
-                        if (currentItem.type === 'viviparous') {
