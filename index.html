@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gesture Sorting Game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="ui">
+    <h1>Gesture Sorting Game</h1>
+    <p id="instructions">Pinch (thumb + index) over an image to pick it up, move it to a bin, then unpinch to drop.</p>
+    <div id="score">Score: <span id="scoreValue">0</span></div>
+    <div id="controls">
+      <button id="shuffleBtn">Shuffle Items</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <div id="game">
+    <!-- Camera and overlay -->
+    <div id="cameraContainer">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+
+    <!-- Items to sort -->
+    <div id="items">
+      <img class="item" data-target="fruit" src="https://picsum.photos/120?random=101" alt="item1" />
+      <img class="item" data-target="animal" src="https://picsum.photos/120?random=102" alt="item2" />
+      <img class="item" data-target="vehicle" src="https://picsum.photos/120?random=103" alt="item3" />
+      <img class="item" data-target="fruit" src="https://picsum.photos/120?random=104" alt="item4" />
+    </div>
+
+    <!-- Bins -->
+    <div id="bins">
+      <div class="bin" data-category="fruit">Fruit</div>
+      <div class="bin" data-category="animal">Animal</div>
+      <div class="bin" data-category="vehicle">Vehicle</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
